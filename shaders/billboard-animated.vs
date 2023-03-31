@@ -18,7 +18,9 @@ out vec2 uv;
 void main()
 {
   color = Color;
-  uv = vPosition.xy; // todo: compute UV coordinates based on Frame
+  int row = int(Frame / Cols);
+  int col = Frame % Cols;
+  uv = vec2((vPosition.x + col) / Cols, (vPosition.y + row) / Rows);
   
   vec3 z = normalize(CameraPos - Offset);
   vec3 x = normalize(cross(vec3(0,1,0), z));
@@ -31,5 +33,6 @@ void main()
   mat3 M = mat3(x, y, z);
 
   vec3 eyePos = M * R * Size * (vPosition - vec3(0.5, 0.5, 0.0)) + Offset;
+  
   gl_Position = MVP * vec4(eyePos, 1.0); 
 }

@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include "agl/window.h"
+#include <ctime>
 
 using namespace std;
 using namespace glm;
@@ -25,38 +26,64 @@ public:
 
   void setup() {
     setWindowSize(1000, 1000);
-    createConfetti(500);
+    createConfetti(200);
     renderer.setDepthTest(false);
     renderer.blendMode(agl::ADD);
   }
 
   void createConfetti(int size)
   {
-    renderer.loadTexture("particle", "../textures/star4.png", 0);
-    for (int i = 0; i < size; i++)
+    // "main" particle
+    Particle particle;
+    particle.color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    particle.size = 0.25f;
+    particle.rot = 0;
+    mParticles.push_back(particle);
+    // other particles
+    for (int i = 1; i < size; i++)
     {
-      Particle particle;
-      particle.color = vec4(agl::randomUnitCube(), 1);
-      particle.size = 0.25;
-      particle.rot = 0.0;
-      particle.pos = agl::randomUnitCube();
-      particle.vel = agl::randomUnitCube();
+      particle.size = 0;
+      particle.color = vec4(agl::randomUnitCube(), 1.0f);
       mParticles.push_back(particle);
     }
   }
 
   void updateConfetti()
-  {
+  {   
+      // update "main" star
+      float theta = elapsedTime();
+      float px = cos(theta);
+      float py = sin(theta);
+      mParticles[0].vel = vec3(px, py, 0) - mParticles[0].pos;
+      mParticles[0].pos = vec3(px, py, 0);
+
+      //update other stars
+      bool singleNew = true;
+      for (int i = 1; i < mParticles.size(); ++i) 
+      {
+          if ((mParticles[i].size == 0 && singleNew) || mParticles[i].color.a <= 0) {
+              singleNew = false;
+              mParticles[i].color = vec4(agl::randomUnitCube(), 1.0f);
+              mParticles[i].size = 0.25f;
+              mParticles[i].pos = mParticles[0].pos;
+              mParticles[i].vel = -mParticles[0].vel + agl::randomUnitCube();
+          } else {
+              mParticles[i].pos = mParticles[i].pos;
+              mParticles[i].color.a -= 0.01;
+              mParticles[i].size = mParticles[i].size * 1.01f;
+          }
+      }
   }
 
   void drawConfetti()
   {
-    renderer.texture("image", "particle");
-    for (int i = 0; i < mParticles.size(); i++)
-    {
-      Particle particle = mParticles[i];
-      renderer.sprite(particle.pos, particle.color, particle.size, particle.rot);
-    }
+      renderer.loadTexture("particle", "../textures/star4.png", 0);
+
+      for (int i = 0; i < mParticles.size(); i++)
+      {
+        Particle particle = mParticles[i];
+        renderer.sprite(particle.pos, particle.color, particle.size, particle.rot);
+      }
   }
 
   void mouseMotion(int x, int y, int dx, int dy) {
@@ -82,7 +109,6 @@ public:
     renderer.perspective(glm::radians(60.0f), aspect, 0.1f, 50.0f);
 
     renderer.lookAt(eyePos, lookPos, up);
-    renderer.sprite(position, vec4(1.0f), 0.25f);
     updateConfetti();
     drawConfetti();
     renderer.endShader();

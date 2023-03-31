@@ -45,11 +45,16 @@ public:
     renderer.beginShader("billboard-animated");
     renderer.texture("image", "explosion");
 
+    frame = elapsedTime() * 30;
+    frame = int(frame);
+    frame = frame % (numRows * numCols);
+
     // 30 fps => each frame 1/30 long, e.g. when time = 1s, we play frame 30
-    frame = 0;
     renderer.setUniform("Frame", frame);
     renderer.setUniform("Rows", numRows);
     renderer.setUniform("Cols", numCols);
+
+    
 
     float aspect = ((float)width()) / height();
     renderer.perspective(glm::radians(60.0f), aspect, 0.1f, 50.0f);
