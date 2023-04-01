@@ -44,16 +44,19 @@ public:
   void draw() {
     renderer.beginShader("billboard-animated");
     renderer.texture("image", "explosion");
-
-    frame = elapsedTime() * 30;
-    frame = int(frame);
-    frame = frame % (numRows * numCols);
+    if (b) {
+        b = false;
+        startTime = elapsedTime();
+    }
 
     // 30 fps => each frame 1/30 long, e.g. when time = 1s, we play frame 30
     renderer.setUniform("Frame", frame);
     renderer.setUniform("Rows", numRows);
     renderer.setUniform("Cols", numCols);
 
+    frame = (elapsedTime() - startTime) * 30;
+    frame = int(frame);
+    frame = frame % (numRows * numCols);
     
 
     float aspect = ((float)width()) / height();
@@ -73,6 +76,8 @@ protected:
   int frame = 0;
   int numRows = 8;
   int numCols = 8;
+  bool b = true;
+  float startTime;
 };
 
 int main(int argc, char** argv)

@@ -17,16 +17,9 @@ void main()
   color = Color;
   uv = vPosition.xy;
 
-  /*vec3 z = normalize(CameraPos - Offset);
+  vec3 z = normalize(CameraPos - Offset);
   vec3 x = normalize(cross(vec3(0,1,0), z));
   vec3 y = normalize(cross(z, x));
-  mat3 R = mat3(x, y, z);*/
-
-  vec3 nHat = normalize(CameraPos - vPosition);
-  float thetaY = atan(nHat.z, nHat.x);
-  vec3 x = vec3(cos(thetaY), 0, -sin(thetaY));
-  vec3 y = vec3(0, 1, 0);
-  vec3 z = vec3(sin(thetaY), 0, cos(thetaY));
   mat3 R = mat3(x, y, z);
 
   x = vec3(cos(Rot), -sin(Rot), 0);

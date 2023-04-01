@@ -18,9 +18,9 @@ public:
 
   void setup() {
     setWindowSize(1000, 1000);
-    renderer.loadShader("billboard",
-      "../shaders/billboard.vs",
-      "../shaders/billboard.fs");
+    renderer.loadShader("simple-texture",
+        "../shaders/simple-texture.vs",
+        "../shaders/simple-texture.fs");
 
     Image img;
     img.load("../textures/tree.png", true);
@@ -77,7 +77,7 @@ public:
   }
 
   void draw() {
-    renderer.beginShader("billboard");
+      renderer.beginShader("simple-texture");
 
     float aspect = ((float)width()) / height();
     renderer.perspective(glm::radians(60.0f), aspect, 0.1f, 50.0f);
@@ -96,6 +96,10 @@ public:
     // draw tree
     renderer.texture("Image", "tree");
     renderer.push();
+    vec3 nHat = normalize(eyePos - lookPos);
+    vec3 vHat = cross(up, nHat);
+    vec3 uHat = cross(nHat, vHat);
+    renderer.rotate(mat3(vHat, uHat, nHat));
     renderer.translate(vec3(-0.5, -0.5, 0));
     renderer.quad(); // vertices span from (0,0,0) to (1,1,0)
     renderer.pop();
@@ -108,11 +112,9 @@ protected:
   vec3 eyePos = vec3(0, 0, 2);
   vec3 lookPos = vec3(0, 0, 0);
   vec3 up = vec3(0, 1, 0);
-  vec3 rotation;
-  vec3 translation;
   vec2 scalar;
-  GLfloat Radius = 10;
-  GLfloat Azimuth = 0;
+  GLfloat Radius = 2;
+  GLfloat Azimuth = 90;
   GLfloat Elevation = 0;
   bool leftMouseDown = false;
 };
