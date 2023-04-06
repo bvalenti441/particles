@@ -83,8 +83,6 @@ public:
     renderer.perspective(glm::radians(60.0f), aspect, 0.1f, 50.0f);
     renderer.lookAt(eyePos, lookPos, up);
 
-    renderer.setUniform("Size", std::min(scalar.x, scalar.y));
-
     // draw plane
     renderer.texture("Image", "grass");
     renderer.push();
@@ -97,9 +95,11 @@ public:
     renderer.texture("Image", "tree");
     renderer.push();
     vec3 nHat = normalize(eyePos - lookPos);
-    vec3 vHat = cross(up, nHat);
-    vec3 uHat = cross(nHat, vHat);
-    renderer.rotate(mat3(vHat, uHat, nHat));
+    float thetaY = atan2(nHat.x, nHat.z);
+    vec3 x = vec3(cos(thetaY), 0, -sin(thetaY));
+    vec3 y = vec3(0, 1, 0);
+    vec3 z = vec3(sin(thetaY), 0, cos(thetaY));
+    renderer.rotate(mat3(x, y, z));
     renderer.translate(vec3(-0.5, -0.5, 0));
     renderer.quad(); // vertices span from (0,0,0) to (1,1,0)
     renderer.pop();
